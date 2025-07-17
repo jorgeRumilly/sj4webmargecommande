@@ -6,11 +6,14 @@ if (!defined('_PS_VERSION_')) {
 
 class Sj4webMargeCommande extends Module
 {
+
+    protected $displayTabName = '';
+
     public function __construct()
     {
         $this->name = 'sj4webmargecommande';
         $this->tab = 'administration';
-        $this->version = '1.0.0';
+        $this->version = '1.1.0';
         $this->author = 'SJ4WEB.FR';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -19,6 +22,7 @@ class Sj4webMargeCommande extends Module
 
         $this->displayName = $this->trans('Marge Commande', [], 'Modules.Sj4webmargecommande.Sj4webmargecommande');
         $this->description = $this->trans('Affiche la marge nette sur la page de commande dans l\'administration.', [], 'Modules.Sj4webmargecommande.Sj4webmargecommande');
+        $this->displayTabName = $this->trans('Recapitulatif des marges', [], 'Modules.Sj4webmargecommande.Sj4webmargecommande');
         $this->ps_versions_compliancy = array('min' => '8.1', 'max' => _PS_VERSION_);
     }
 
@@ -27,12 +31,28 @@ class Sj4webMargeCommande extends Module
         return parent::install()
             && $this->registerHook('displayAdminOrderSide')
             && $this->registerHook('actionAdminControllerSetMedia') // Pour gérer le téléchargement du fichier
-            && $this->installDB();
+            && $this->installDB()
+            && $this->installTab();
     }
 
     public function uninstall()
     {
-        return parent::uninstall() && $this->uninstallDB();
+        return parent::uninstall()
+            && $this->uninstallDB()
+            && $this->uninstallTab();
+    }
+
+    public function installTab()
+    {
+        $tab = new Tab();
+        $tab->class_name = 'AdminSj4webMargeCommandeFees';
+        $tab->module = $this->name;
+        $tab->id_parent = (int)Tab::getIdFromClassName('AdminParentOrders');
+        $tab->name = [];
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = $this->displayTabName;
+        }
+        return $tab->add();
     }
 
     protected function installDB()
@@ -46,6 +66,16 @@ class Sj4webMargeCommande extends Module
             PRIMARY KEY (`id_order_fee`)
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
         return Db::getInstance()->execute($sql);
+    }
+
+    protected function uninstallTab()
+    {
+        $idTab = (int)Tab::getIdFromClassName('AdminSj4webMargeCommandeFees');
+        if ($idTab) {
+            $tab = new Tab($idTab);
+            return $tab->delete();
+        }
+        return true;
     }
 
     protected function uninstallDB()
@@ -173,7 +203,7 @@ class Sj4webMargeCommande extends Module
         return $this->display(__FILE__, 'views/templates/admin/displayAdminOrder.tpl');
     }
 
-    protected function getOrderCostPrice(Order $order)
+    public function getOrderCostPrice(Order $order)
     {
         $costPrice = 0;
         foreach ($order->getProducts() as $product) {
@@ -182,7 +212,7 @@ class Sj4webMargeCommande extends Module
         return $costPrice;
     }
 
-    protected function calculateDropshippingFees(Order $order)
+    public function calculateDropshippingFees(Order $order)
     {
         // Double désencodage car on json_encode à l'enregistrement en base
         $fees = json_decode(json_decode(Configuration::get('SJ4WEB_FEE_LIST'), true), true);
@@ -229,7 +259,7 @@ class Sj4webMargeCommande extends Module
         return $totalFees;
     }
 
-    protected function getPaymentFees($orderId)
+    public function getPaymentFees($orderId)
     {
         $sql = 'SELECT fee FROM ' . _DB_PREFIX_ . 'order_fees WHERE id_order = ' . (int)$orderId;
         return (float)Db::getInstance()->getValue($sql);

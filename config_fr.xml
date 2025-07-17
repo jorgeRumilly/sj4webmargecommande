@@ -2,7 +2,7 @@
 <module>
     <name>sj4webmargecommande</name>
     <displayName><![CDATA[Marge Commande]]></displayName>
-    <version><![CDATA[1.0.0]]></version>
+    <version><![CDATA[1.1.0]]></version>
     <description><![CDATA[Affiche la marge nette sur la page de commande dans l&#039;administration.]]></description>
     <author><![CDATA[SJ4WEB.FR]]></author>
     <tab><![CDATA[administration]]></tab>
