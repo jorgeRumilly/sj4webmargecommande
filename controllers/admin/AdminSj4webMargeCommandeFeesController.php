@@ -8,17 +8,23 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         parent::__construct();
     }
 
-    public function renderList()
+    public function initContent()
     {
-        // Requête brute : on récupère toutes les commandes
-        $sql = 'SELECT o.id_order, o.reference, o.date_add,
-                       o.total_paid_tax_excl, o.total_paid_tax_incl,
-                       o.total_shipping_tax_excl, o.total_shipping_tax_incl,
-                       o.payment
-                FROM ' . _DB_PREFIX_ . 'orders o
-                ORDER BY o.date_add DESC
-                LIMIT 200';
+        parent::initContent();
 
+        $this->meta_title = $this->trans('Marge Commande - Liste des commandes', [], 'Modules.Sj4webMargeCommande.Admin');
+
+// Requête brute : on récupère toutes les commandes
+        $sql = $this->getSqlOrderFees(true);
+        $nb_orders = (int)Db::getInstance()->getValue($sql);
+
+        $page = max(1, (int)Tools::getValue('submitFiltersj4webmargecommande_fees', 1));
+        $limit = (int)Tools::getValue('sj4webmargecommande_fees_pagination', 20);
+        $offset = ($page - 1) * $limit;
+
+
+        // Requête brute : on récupère toutes les commandes
+        $sql = $this->getSqlOrderFees(false, $offset, $limit);
         $orders = Db::getInstance()->executeS($sql);
 
         $data = [];
@@ -74,17 +80,17 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         }
 
         $fields_list = [
-            'id_order' => ['title' => 'ID'],
-            'reference' => ['title' => 'Référence'],
-            'date_add' => ['title' => 'Date'],
-            'total_paid_tax_excl' => ['title' => 'Total HT', 'type' => 'price', 'currency' => true],
-            'total_paid_tax_incl' => ['title' => 'Total TTC', 'type' => 'price', 'currency' => true],
-            'total_shipping_tax_excl' => ['title' => 'Livraison HT', 'type' => 'price', 'currency' => true],
-            'total_shipping_tax_incl' => ['title' => 'Livraison TTC', 'type' => 'price', 'currency' => true],
-            'refund_products_ttc' => ['title' => 'Remb. produits TTC', 'type' => 'price', 'currency' => true],
-            'refund_shipping_ttc' => ['title' => 'Remb. livraison TTC', 'type' => 'price', 'currency' => true],
-            'nb_products' => ['title' => 'Nb Produits'],
-            'payment_method' => ['title' => 'Moyen paiement'],
+            'id_order' => ['title' => 'ID', 'filter_key' => 'o!id_order', 'type' => 'int'],
+            'reference' => ['title' => 'Référence', 'filter_key' => 'o!reference', 'type' => 'text'],
+            'date_add' => ['title' => 'Date', 'type' => 'datetime', 'filter_key' => 'o!date_add'],
+            'total_paid_tax_excl' => ['title' => 'Total HT', 'type' => 'price', 'currency' => true, 'search' => false, 'filter' => false],
+            'total_paid_tax_incl' => ['title' => 'Total TTC', 'type' => 'price', 'currency' => true, 'search' => false, 'filter' => false],
+            'total_shipping_tax_excl' => ['title' => 'Livraison HT', 'type' => 'price', 'currency' => true, 'search' => false, 'filter' => false],
+            'total_shipping_tax_incl' => ['title' => 'Livraison TTC', 'type' => 'price', 'currency' => true, 'search' => false, 'filter' => false],
+            'refund_products_ttc' => ['title' => 'Remb. produits TTC', 'type' => 'price', 'currency' => true, 'search' => false, 'filter' => false],
+            'refund_shipping_ttc' => ['title' => 'Remb. livraison TTC', 'type' => 'price', 'currency' => true, 'search' => false, 'filter' => false],
+            'nb_products' => ['title' => 'Nb Produits', 'search' => false, 'filter' => false],
+            'payment_method' => ['title' => 'Moyen paiement', 'type' => 'text', 'filter_key' => 'o!payment'],
             'commission_ttc' => ['title' => 'Commission TTC', 'type' => 'price', 'currency' => true],
             'dropshipping_fees' => ['title' => 'Coût dropshipping', 'type' => 'price', 'currency' => true],
             'margin' => ['title' => 'Marge nette', 'type' => 'price', 'currency' => true],
@@ -93,14 +99,33 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         $helper = new HelperList();
         $helper->title = 'Marge Commande - Liste des commandes';
         $helper->shopLinkType = '';
-        $helper->simple_header = true;
+        $helper->simple_header = false;
         $helper->identifier = 'id_order';
-        $helper->show_toolbar = false;
+        $helper->show_toolbar = true;
         $helper->module = $this->module;
-        $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->module->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->table = 'sj4webmargecommande_fees';
+//        $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->module->name;
+        $helper->currentIndex = AdminController::$currentIndex;
+        $helper->token = Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees');
+//        $helper->actions = ['view']; // facultatif si tu veux des actions
+        $helper->listTotal = $nb_orders; // ou utilise SQL COUNT pour perf count($data)
+        $helper->tpl_vars['pagination'] = [20, 50, 100, 300];
+        $helper->tpl_vars['show_toolbar'] = true;
+        $helper->tpl_vars['show_pagination'] = true;
 
-        return $helper->generateList($data, $fields_list);
+//        $helper->show_filter = true;
+//        $helper->default_pagination = 50;
+//        $helper->pagination = [20, 50, 100, 300];
+        $helper->orderBy = 'id_order';
+        $helper->orderWay = 'DESC';
+
+//        return $helper->generateList($data, $fields_list);
+        $this->context->smarty->assign('content', $helper->generateList($data, $fields_list));
+    }
+
+    public function renderList()
+    {
+        return parent::renderList();
     }
 
     protected function getOrderNbProducts($orderId): int
@@ -125,5 +150,28 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
             'products' => $result['refund_products'] ?? 0,
             'shipping' => $result['refund_shipping'] ?? 0,
         ];
+    }
+
+    /**
+     * @param int $offset
+     * @param int $limit
+     * @return string
+     */
+    public function getSqlOrderFees(bool $count = false, int $offset = 0, int $limit = 50): string
+    {
+        if ($count) {
+            $sql = 'SELECT COUNT(o.id_order) AS total
+                    FROM ' . _DB_PREFIX_ . 'orders o';
+            return $sql;
+        };
+
+        $sql = 'SELECT o.id_order, o.reference, o.date_add,
+                       o.total_paid_tax_excl, o.total_paid_tax_incl,
+                       o.total_shipping_tax_excl, o.total_shipping_tax_incl,
+                       o.payment
+                FROM ' . _DB_PREFIX_ . 'orders o
+                ORDER BY o.date_add DESC
+                LIMIT ' . (int)$offset . ', ' . $limit;
+        return $sql;
     }
 }
