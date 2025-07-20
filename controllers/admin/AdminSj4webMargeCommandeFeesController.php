@@ -14,7 +14,7 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
 
         $this->meta_title = $this->trans('Marge Commande - Liste des commandes', [], 'Modules.Sj4webMargeCommande.Admin');
 
-// Requête brute : on récupère toutes les commandes
+        // Requête brute : on récupère toutes les commandes
         $sql = $this->getSqlOrderFees(true);
         $nb_orders = (int)Db::getInstance()->getValue($sql);
 
@@ -121,27 +121,20 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         $helper->show_toolbar = true;
         $helper->module = $this->module;
         $helper->table = 'sj4webmargecommande_fees';
-//        $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->module->name;
         $helper->currentIndex = AdminController::$currentIndex;
         $helper->token = Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees');
-//        $helper->actions = ['view']; // facultatif si tu veux des actions
         $helper->listTotal = $nb_orders; // ou utilise SQL COUNT pour perf count($data)
         $helper->tpl_vars['pagination'] = [20, 50, 100, 300];
         $helper->tpl_vars['show_toolbar'] = true;
         $helper->tpl_vars['show_pagination'] = true;
         $helper->tpl_vars['show_filters'] = true;
         $helper->no_link = true; // pour éviter les liens automatiques sur les champs
-
-//        $helper->show_filter = true;
         $helper->_default_pagination = 20;
-//        $helper->pagination = [20, 50, 100, 300];
         $helper->orderBy = 'id_order';
         $helper->orderWay = 'DESC';
-
-//        return $helper->generateList($data, $fields_list);
-        $_before_html = $this->getHtmlCsvButton();
-
-        $this->context->smarty->assign('content', $_before_html . $helper->generateList($data, $fields_list));
+        $button_exel = $this->getHtmlCsvButton();
+        $this->context->smarty->assign(['button_exel' => $button_exel]);
+        $this->context->smarty->assign('content', $helper->generateList($data, $fields_list));
     }
 
     public function renderList()

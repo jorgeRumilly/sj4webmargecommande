@@ -25,5 +25,5 @@
 
 {extends file="helpers/list/list_header.tpl"}
 {block name="preTable"}
-    Truc machin chose
+    {$button_exel}
 {/block}
