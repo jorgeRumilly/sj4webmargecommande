@@ -171,7 +171,7 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
      * @param int $limit
      * @return string
      */
-    public function getSqlOrderFees(bool $count = false, int $offset = 0, int $limit = 50): string
+    public function getSqlOrderFees(bool $count = false, int $offset = 0, int $limit = 50, $useLimits = true): string
     {
         if ($count) {
             $sql = 'SELECT COUNT(o.id_order) AS total
@@ -184,8 +184,7 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
                        o.total_shipping_tax_excl, o.total_shipping_tax_incl,
                        o.payment
                 FROM ' . _DB_PREFIX_ . 'orders o
-                ORDER BY o.date_add DESC
-                LIMIT ' . (int)$offset . ', ' . $limit;
+                ORDER BY o.date_add DESC ' . ($useLimits ? 'LIMIT ' . (int)$offset . ', ' . (int)$limit : '');
         return $sql;
     }
 
@@ -228,5 +227,114 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
     public function getHtmlCsvButton() {
         return '<a class="btn btn-default" href="'.AdminController::$currentIndex.'&export=1&token='.Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees').'"><i class="icon-download"></i> Export CSV</a>';
     }
+
+    public function postProcess()
+    {
+        if (Tools::getIsset('export')) {
+            $this->exportCsv();
+        }
+    }
+
+    protected function exportCsv()
+    {
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="marge_commandes.csv"');
+
+        $output = fopen('php://output', 'w');
+
+        // Définis les entêtes CSV
+        $headers = [
+            'ID commande',
+            'Date',
+            'Total HT',
+            'Total TTC',
+            'Livraison HT',
+            'Livraison TTC',
+            'Remb. produits',
+            'Remb. livraison',
+            'Nb produits',
+            'Moyen paiement',
+            'Commission TTC',
+            '% Commission',
+            'Coût drop',
+            'Marge HT',
+            '% Marge',
+            '% Marque',
+        ];
+        fputcsv($output, $headers);
+
+        foreach ($this->getFilteredOrders(0,0, false) as $row) {
+            fputcsv($output, [
+                $row['id_order'],
+                $row['date_add'],
+                $row['total_paid_tax_excl'],
+                $row['total_paid_tax_incl'],
+                $row['total_shipping_tax_excl'],
+                $row['total_shipping_tax_incl'],
+                $row['refund_products_ttc'],
+                $row['refund_shipping_ttc'],
+                $row['nb_products'],
+                $row['payment_method'],
+                $row['commission_ttc'],
+                $row['commission_percent'],
+                $row['dropshipping_fees'],
+                $row['margin'],
+                $row['margin_rate'],
+                $row['markup_rate'],
+            ]);
+        }
+
+        fclose($output);
+        exit;
+    }
+
+
+    protected function getFilteredOrders($limit, $offset, $useLimits = true): array
+    {
+        // 💡 c’est juste le même bloc que dans renderList()
+        // mais sans la partie HelperList
+
+        // Requête brute : on récupère toutes les commandes
+        $sql = $this->getSqlOrderFees(false, $offset, $limit, $useLimits);
+        $orders = Db::getInstance()->executeS($sql);
+        $data = [];
+
+        foreach ($orders as $orderRow) {
+            $id_order = (int)$orderRow['id_order'];
+            $order = new Order($id_order);
+
+            $nb_products = $this->getOrderNbProducts($id_order);
+            $dropshippingFees = $this->module->calculateDropshippingFees($order);
+            $costPrice = $this->module->getOrderCostPrice($order);
+            $commissionTTC = $this->module->getPaymentFees($id_order);
+            $refunds = $this->getOrderRefunds($id_order);
+
+            $prix_vente_ht = $order->total_paid_tax_excl - $refunds['products'] - $refunds['shipping'];
+            $marge = $prix_vente_ht - $costPrice - $dropshippingFees - $commissionTTC;
+
+            $data[] = [
+                'id_order'            => $id_order,
+                'date_add'            => $orderRow['date_add'],
+                'total_paid_tax_excl' => $order->total_paid_tax_excl,
+                'total_paid_tax_incl' => $order->total_paid_tax_incl,
+                'total_shipping_tax_excl' => $order->total_shipping_tax_excl,
+                'total_shipping_tax_incl' => $order->total_shipping_tax_incl,
+                'refund_products_ttc' => $refunds['products'],
+                'refund_shipping_ttc' => $refunds['shipping'],
+                'nb_products'         => $nb_products,
+                'payment_method'      => $orderRow['payment'],
+                'commission_ttc'      => $commissionTTC,
+                'commission_percent'  => $prix_vente_ht > 0 ? round($commissionTTC / $prix_vente_ht * 100, 2) : 0,
+                'dropshipping_fees'   => $dropshippingFees,
+                'margin'              => $marge,
+                'margin_rate'         => $costPrice > 0 ? round($marge / $costPrice * 100, 2) : 0,
+                'markup_rate'         => $prix_vente_ht > 0 ? round($marge / $prix_vente_ht * 100, 2) : 0,
+            ];
+        }
+
+        return $data;
+    }
+
+
 
 }
