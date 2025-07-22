@@ -171,7 +171,7 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
      * @param int $limit
      * @return string
      */
-    public function getSqlOrderFees(bool $count = false, int $offset = 0, int $limit = 50, $useLimits = true): string
+    public function getSqlOrderFees(bool $count = false, int $offset = 0, int $limit = 50, $useLimits = true, $whereClause=[]): string
     {
         if ($count) {
             $sql = 'SELECT COUNT(o.id_order) AS total
@@ -183,8 +183,9 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
                        o.total_paid_tax_excl, o.total_paid_tax_incl,
                        o.total_shipping_tax_excl, o.total_shipping_tax_incl,
                        o.payment
-                FROM ' . _DB_PREFIX_ . 'orders o
-                ORDER BY o.date_add DESC ' . ($useLimits ? 'LIMIT ' . (int)$offset . ', ' . (int)$limit : '');
+                FROM ' . _DB_PREFIX_ . 'orders o '.
+                (count($whereClause) ? 'WHERE '.implode(' AND ', $whereClause) : '').
+                'ORDER BY o.date_add DESC ' . ($useLimits ? 'LIMIT ' . (int)$offset . ', ' . (int)$limit : '');
         return $sql;
     }
 
@@ -293,6 +294,33 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
     {
         // 💡 c’est juste le même bloc que dans renderList()
         // mais sans la partie HelperList
+        $filter_keys ='';
+        $whereclause = [];
+        if(Tools::getIsset('sj4webmargecommande_feesFilter_o!payment'))
+        {
+            $whereclause[] = [
+                'o.payment LIKE \'%' . pSQL(Tools::getValue('sj4webmargecommande_feesFilter_o!payment')) . '%\'',
+            ];
+        }
+        if(Tools::getIsset('sj4webmargecommande_feesFilter_o!date_add[0]'))
+        {
+            $whereclause[] = [
+                'o.date_add >= \'' . pSQL(Tools::getValue('sj4webmargecommande_feesFilter_o!date_add[0]')) . '\'',
+            ];
+        }
+        if(Tools::getIsset('sj4webmargecommande_feesFilter_o!date_add[1]'))
+        {
+            $whereclause[] = [
+                'o.date_add <= \'' . pSQL(Tools::getValue('sj4webmargecommande_feesFilter_o!date_add[1]')) . '\'',
+            ];
+        }
+        if(Tools::getIsset('sj4webmargecommande_feesFilter_o!id_order'))
+        {
+            $whereclause[] = [
+                'o.id_order = ' . (int)Tools::getValue('sj4webmargecommande_feesFilter_o!id_order'),
+            ];
+        }
+
 
         // Requête brute : on récupère toutes les commandes
         $sql = $this->getSqlOrderFees(false, $offset, $limit, $useLimits);
