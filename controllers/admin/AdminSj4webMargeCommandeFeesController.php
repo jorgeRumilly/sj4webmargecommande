@@ -15,7 +15,7 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         $this->meta_title = $this->trans('Marge Commande - Liste des commandes', [], 'Modules.Sj4webMargeCommande.Admin');
 
         // Requête brute : on récupère toutes les commandes
-        $sql = $this->getSqlOrderFees(true);
+        $sql = $this->getSqlOrderFees(true, false);
         $nb_orders = (int)Db::getInstance()->getValue($sql);
 
         $page = max(1, (int)Tools::getValue('submitFiltersj4webmargecommande_fees', 1));
@@ -24,75 +24,77 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
 
 
         // Requête brute : on récupère toutes les commandes
-        $sql = $this->getSqlOrderFees(false, $offset, $limit);
-        $orders = Db::getInstance()->executeS($sql);
+//        $sql = $this->getSqlOrderFees(false, $offset, $limit);
+//        $orders = Db::getInstance()->executeS($sql);
 
-        $data = [];
-        foreach ($orders as $orderRow) {
-            $id_order = (int)$orderRow['id_order'];
+        $data = $this->getFilteredOrders($limit, $offset, true);
 
-            // Crée un objet Order PrestaShop natif
-            $order = new Order($id_order);
-
-            // Nb produits
-            $nb_products = $this->getOrderNbProducts($id_order);
-
-            // Coût dropshipping via ton module existant
-            $dropshippingFees = method_exists($this->module, 'calculateDropshippingFees')
-                ? $this->module->calculateDropshippingFees($order)
-                : 0;
-
-            // Coût d'achat total
-            $costPrice = method_exists($this->module, 'getOrderCostPrice')
-                ? $this->module->getOrderCostPrice($order)
-                : 0;
-
-            // Commission TTC enregistrée
-            $commissionTTC = method_exists($this->module, 'getPaymentFees')
-                ? $this->module->getPaymentFees($id_order)
-                : 0;
-
-            // Montants remboursements
-            $refunds = $this->getOrderRefunds($id_order);
-
-            // Marge nette
-            $margin = $order->total_paid_tax_excl - $order->total_shipping_tax_excl
-                - $costPrice
-                - $dropshippingFees
-                - $commissionTTC;
-
-            $commission_percent = $order->total_paid_tax_incl > 0
-                ? round($commissionTTC / $order->total_paid_tax_incl * 100, 2)
-                : 0;
-            $margin_rate = $costPrice > 0
-                ? round($margin / $costPrice * 100, 2)
-                : 0;
-            $markup_rate = ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) > 0
-                ? round($margin / ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) * 100, 2)
-                : 0;
-
-
-
-            $data[] = [
-                'id_order' => $id_order,
-                'reference' => $orderRow['reference'],
-                'date_add' => $orderRow['date_add'],
-                'total_paid_tax_excl' => $orderRow['total_paid_tax_excl'],
-                'total_paid_tax_incl' => $orderRow['total_paid_tax_incl'],
-                'total_shipping_tax_excl' => $orderRow['total_shipping_tax_excl'],
-                'total_shipping_tax_incl' => $orderRow['total_shipping_tax_incl'],
-                'refund_products_ttc' => $refunds['products'],
-                'refund_shipping_ttc' => $refunds['shipping'],
-                'nb_products' => $nb_products,
-                'payment_method' => $orderRow['payment'],
-                'commission_ttc' => $commissionTTC,
-                'dropshipping_fees' => $dropshippingFees,
-                'margin' => $margin,
-                'commission_percent' => $commission_percent,
-                'margin_rate' => $margin_rate,
-                'markup_rate' => $markup_rate,
-            ];
-        }
+//        $data = [];
+//        foreach ($orders as $orderRow) {
+//            $id_order = (int)$orderRow['id_order'];
+//
+//            // Crée un objet Order PrestaShop natif
+//            $order = new Order($id_order);
+//
+//            // Nb produits
+//            $nb_products = $this->getOrderNbProducts($id_order);
+//
+//            // Coût dropshipping via ton module existant
+//            $dropshippingFees = method_exists($this->module, 'calculateDropshippingFees')
+//                ? $this->module->calculateDropshippingFees($order)
+//                : 0;
+//
+//            // Coût d'achat total
+//            $costPrice = method_exists($this->module, 'getOrderCostPrice')
+//                ? $this->module->getOrderCostPrice($order)
+//                : 0;
+//
+//            // Commission TTC enregistrée
+//            $commissionTTC = method_exists($this->module, 'getPaymentFees')
+//                ? $this->module->getPaymentFees($id_order)
+//                : 0;
+//
+//            // Montants remboursements
+//            $refunds = $this->getOrderRefunds($id_order);
+//
+//            // Marge nette
+//            $margin = $order->total_paid_tax_excl - $order->total_shipping_tax_excl
+//                - $costPrice
+//                - $dropshippingFees
+//                - $commissionTTC;
+//
+//            $commission_percent = $order->total_paid_tax_incl > 0
+//                ? round($commissionTTC / $order->total_paid_tax_incl * 100, 2)
+//                : 0;
+//            $margin_rate = $costPrice > 0
+//                ? round($margin / $costPrice * 100, 2)
+//                : 0;
+//            $markup_rate = ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) > 0
+//                ? round($margin / ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) * 100, 2)
+//                : 0;
+//
+//
+//
+//            $data[] = [
+//                'id_order' => $id_order,
+//                'reference' => $orderRow['reference'],
+//                'date_add' => $orderRow['date_add'],
+//                'total_paid_tax_excl' => $orderRow['total_paid_tax_excl'],
+//                'total_paid_tax_incl' => $orderRow['total_paid_tax_incl'],
+//                'total_shipping_tax_excl' => $orderRow['total_shipping_tax_excl'],
+//                'total_shipping_tax_incl' => $orderRow['total_shipping_tax_incl'],
+//                'refund_products_ttc' => $refunds['products'],
+//                'refund_shipping_ttc' => $refunds['shipping'],
+//                'nb_products' => $nb_products,
+//                'payment_method' => $orderRow['payment'],
+//                'commission_ttc' => $commissionTTC,
+//                'dropshipping_fees' => $dropshippingFees,
+//                'margin' => $margin,
+//                'commission_percent' => $commission_percent,
+//                'margin_rate' => $margin_rate,
+//                'markup_rate' => $markup_rate,
+//            ];
+//        }
 
         $fields_list = [
             'id_order' => ['title' => 'ID', 'filter_key' => 'o!id_order', 'type' => 'int', 'callback' => 'renderLinkToOrder'],
@@ -171,21 +173,40 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
      * @param int $limit
      * @return string
      */
-    public function getSqlOrderFees(bool $count = false, int $offset = 0, int $limit = 50, $useLimits = true, $whereClause=[]): string
+    public function getSqlOrderFees(bool $count = false, $useLimits = true, int $offset = 0, int $limit = 50): string
     {
-        if ($count) {
-            $sql = 'SELECT COUNT(o.id_order) AS total
-                    FROM ' . _DB_PREFIX_ . 'orders o';
-            return $sql;
-        };
 
-        $sql = 'SELECT o.id_order, o.reference, o.date_add,
-                       o.total_paid_tax_excl, o.total_paid_tax_incl,
-                       o.total_shipping_tax_excl, o.total_shipping_tax_incl,
-                       o.payment
-                FROM ' . _DB_PREFIX_ . 'orders o '.
-                (count($whereClause) ? 'WHERE '.implode(' AND ', $whereClause) : '').
-                'ORDER BY o.date_add DESC ' . ($useLimits ? 'LIMIT ' . (int)$offset . ', ' . (int)$limit : '');
+        $whereClause = $this->getWhereclause();
+
+        $sql_select = 'SELECT ';
+        if($count) {
+            $sql_select .= 'COUNT(o.id_order) AS total';
+        } else {
+            $sql_select .= 'o.id_order, o.reference, o.date_add, 
+                           o.total_paid_tax_excl, o.total_paid_tax_incl,
+                           o.total_shipping_tax_excl, o.total_shipping_tax_incl,
+                           o.payment AS payment_method';
+        }
+        $sql_from = ' FROM ' . _DB_PREFIX_ . 'orders o ';
+        $sql_where = (count($whereClause) ? ' WHERE ' . implode(' AND ', $whereClause) : '');
+        $sql_order = ' ORDER BY o.date_add DESC ';
+        $sql_limit = ($useLimits ? ' LIMIT ' . (int)$offset . ', ' . (int)$limit : '');
+
+        $sql = $sql_select . $sql_from . $sql_where . $sql_order . $sql_limit;
+
+//        if ($count) {
+//            $sql = 'SELECT COUNT(o.id_order) AS total
+//                    FROM ' . _DB_PREFIX_ . 'orders o';
+//            return $sql;
+//        };
+//
+//        $sql = 'SELECT o.id_order, o.reference, o.date_add,
+//                       o.total_paid_tax_excl, o.total_paid_tax_incl,
+//                       o.total_shipping_tax_excl, o.total_shipping_tax_incl,
+//                       o.payment
+//                FROM ' . _DB_PREFIX_ . 'orders o ' .
+//                (count($whereClause) ? ' WHERE ' . implode(' AND ', $whereClause) : '') .
+//            ' ORDER BY o.date_add DESC ' . ($useLimits ? 'LIMIT ' . (int)$offset . ', ' . (int)$limit : '');
         return $sql;
     }
 
@@ -225,8 +246,9 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         return '<span style="color:' . $color . '; font-weight:bold;">' . Tools::displayPrice($value) . '</span>';
     }
 
-    public function getHtmlCsvButton() {
-        return '<a class="btn btn-default" href="'.AdminController::$currentIndex.'&export=1&token='.Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees').'"><i class="icon-download"></i> Export CSV</a>';
+    public function getHtmlCsvButton()
+    {
+        return '<a class="btn btn-default" href="' . AdminController::$currentIndex . '&export=1&token=' . Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees') . '"><i class="icon-download"></i> Export CSV</a>';
     }
 
     public function postProcess()
@@ -264,7 +286,7 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         ];
         fputcsv($output, $headers);
 
-        foreach ($this->getFilteredOrders(0,0, false) as $row) {
+        foreach ($this->getFilteredOrders(0, 0, false) as $row) {
             fputcsv($output, [
                 $row['id_order'],
                 $row['date_add'],
@@ -293,76 +315,119 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
     protected function getFilteredOrders($limit, $offset, $useLimits = true): array
     {
         // 💡 c’est juste le même bloc que dans renderList()
-        // mais sans la partie HelperList
-        $filter_keys ='';
-        $whereclause = [];
-        if(Tools::getIsset('sj4webmargecommande_feesFilter_o!payment'))
-        {
-            $whereclause[] = [
-                'o.payment LIKE \'%' . pSQL(Tools::getValue('sj4webmargecommande_feesFilter_o!payment')) . '%\'',
-            ];
-        }
-        if(Tools::getIsset('sj4webmargecommande_feesFilter_o!date_add[0]'))
-        {
-            $whereclause[] = [
-                'o.date_add >= \'' . pSQL(Tools::getValue('sj4webmargecommande_feesFilter_o!date_add[0]')) . '\'',
-            ];
-        }
-        if(Tools::getIsset('sj4webmargecommande_feesFilter_o!date_add[1]'))
-        {
-            $whereclause[] = [
-                'o.date_add <= \'' . pSQL(Tools::getValue('sj4webmargecommande_feesFilter_o!date_add[1]')) . '\'',
-            ];
-        }
-        if(Tools::getIsset('sj4webmargecommande_feesFilter_o!id_order'))
-        {
-            $whereclause[] = [
-                'o.id_order = ' . (int)Tools::getValue('sj4webmargecommande_feesFilter_o!id_order'),
-            ];
-        }
-
-
         // Requête brute : on récupère toutes les commandes
-        $sql = $this->getSqlOrderFees(false, $offset, $limit, $useLimits);
+        $sql = $this->getSqlOrderFees(false, $useLimits, $offset, $limit);
         $orders = Db::getInstance()->executeS($sql);
         $data = [];
 
         foreach ($orders as $orderRow) {
             $id_order = (int)$orderRow['id_order'];
             $order = new Order($id_order);
-
+            // Nb produits
             $nb_products = $this->getOrderNbProducts($id_order);
-            $dropshippingFees = $this->module->calculateDropshippingFees($order);
-            $costPrice = $this->module->getOrderCostPrice($order);
-            $commissionTTC = $this->module->getPaymentFees($id_order);
+
+            // Coût dropshipping via ton module existant
+            $dropshippingFees = method_exists($this->module, 'calculateDropshippingFees')
+                ? $this->module->calculateDropshippingFees($order)
+                : 0;
+
+            // Coût d'achat total
+            $costPrice = method_exists($this->module, 'getOrderCostPrice')
+                ? $this->module->getOrderCostPrice($order)
+                : 0;
+
+            // Commission TTC enregistrée
+            $commissionTTC = method_exists($this->module, 'getPaymentFees')
+                ? $this->module->getPaymentFees($id_order)
+                : 0;
+
+            // Montants remboursements
             $refunds = $this->getOrderRefunds($id_order);
 
-            $prix_vente_ht = $order->total_paid_tax_excl - $refunds['products'] - $refunds['shipping'];
-            $marge = $prix_vente_ht - $costPrice - $dropshippingFees - $commissionTTC;
+            // Marge nette
+            $margin = $order->total_paid_tax_excl - $order->total_shipping_tax_excl
+                - $costPrice
+                - $dropshippingFees
+                - $commissionTTC;
+
+            $commission_percent = $order->total_paid_tax_incl > 0
+                ? round($commissionTTC / $order->total_paid_tax_incl * 100, 2)
+                : 0;
+            $margin_rate = $costPrice > 0
+                ? round($margin / $costPrice * 100, 2)
+                : 0;
+            $markup_rate = ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) > 0
+                ? round($margin / ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) * 100, 2)
+                : 0;
+
+//            $data[] = [
+//                'id_order'            => $id_order,
+//                'date_add'            => $orderRow['date_add'],
+//                'total_paid_tax_excl' => $order->total_paid_tax_excl,
+//                'total_paid_tax_incl' => $order->total_paid_tax_incl,
+//                'total_shipping_tax_excl' => $order->total_shipping_tax_excl,
+//                'total_shipping_tax_incl' => $order->total_shipping_tax_incl,
+//                'refund_products_ttc' => $refunds['products'],
+//                'refund_shipping_ttc' => $refunds['shipping'],
+//                'nb_products'         => $nb_products,
+//                'payment_method'      => $orderRow['payment'],
+//                'commission_ttc'      => $commissionTTC,
+//                'commission_percent'  => $prix_vente_ht > 0 ? round($commissionTTC / $prix_vente_ht * 100, 2) : 0,
+//                'dropshipping_fees'   => $dropshippingFees,
+//                'margin'              => $marge,
+//                'margin_rate'         => $costPrice > 0 ? round($marge / $costPrice * 100, 2) : 0,
+//                'markup_rate'         => $prix_vente_ht > 0 ? round($marge / $prix_vente_ht * 100, 2) : 0,
+//            ];
 
             $data[] = [
-                'id_order'            => $id_order,
-                'date_add'            => $orderRow['date_add'],
-                'total_paid_tax_excl' => $order->total_paid_tax_excl,
-                'total_paid_tax_incl' => $order->total_paid_tax_incl,
-                'total_shipping_tax_excl' => $order->total_shipping_tax_excl,
-                'total_shipping_tax_incl' => $order->total_shipping_tax_incl,
+                'id_order' => $id_order,
+                'date_add' => $orderRow['date_add'],
+                'total_paid_tax_excl' => $orderRow['total_paid_tax_excl'],
+                'total_paid_tax_incl' => $orderRow['total_paid_tax_incl'],
+                'total_shipping_tax_excl' => $orderRow['total_shipping_tax_excl'],
+                'total_shipping_tax_incl' => $orderRow['total_shipping_tax_incl'],
                 'refund_products_ttc' => $refunds['products'],
                 'refund_shipping_ttc' => $refunds['shipping'],
-                'nb_products'         => $nb_products,
-                'payment_method'      => $orderRow['payment'],
-                'commission_ttc'      => $commissionTTC,
-                'commission_percent'  => $prix_vente_ht > 0 ? round($commissionTTC / $prix_vente_ht * 100, 2) : 0,
-                'dropshipping_fees'   => $dropshippingFees,
-                'margin'              => $marge,
-                'margin_rate'         => $costPrice > 0 ? round($marge / $costPrice * 100, 2) : 0,
-                'markup_rate'         => $prix_vente_ht > 0 ? round($marge / $prix_vente_ht * 100, 2) : 0,
+                'nb_products' => $nb_products,
+                'payment_method' => $orderRow['payment'],
+                'commission_ttc' => $commissionTTC,
+                'dropshipping_fees' => $dropshippingFees,
+                'margin' => $margin,
+                'commission_percent' => $commission_percent,
+                'margin_rate' => $margin_rate,
+                'markup_rate' => $markup_rate,
             ];
+
         }
 
         return $data;
     }
 
+    /**
+     * @return array
+     */
+    public function getWhereclause(): array
+    {
+        $whereclause = [];
+        if (Tools::getIsset('sj4webmargecommande_feesFilter_o!payment') && Tools::getValue('sj4webmargecommande_feesFilter_o!payment') !== '') {
+            $whereclause[] = 'o.payment LIKE \'%' . pSQL(Tools::getValue('sj4webmargecommande_feesFilter_o!payment')) . '%\'';
+        }
+        if (Tools::getIsset('sj4webmargecommande_feesFilter_o!date_add')) {
+            $date_add = Tools::getValue('sj4webmargecommande_feesFilter_o!date_add');
+            if (is_array($date_add) && count($date_add) > 0) {
+                if (!empty($date_add[0])) {
+                    $whereclause[] = 'o.date_add >= \'' . pSQL($date_add[0]) . '\'';
+                }
+                if (!empty($date_add[1])) {
+                    $whereclause[] = 'o.date_add <= \'' . pSQL($date_add[1]) . '\'';
+                }
+            }
+        }
+        if (Tools::getIsset('sj4webmargecommande_feesFilter_o!id_order') && Tools::getValue('sj4webmargecommande_feesFilter_o!id_order') !== '') {
+            $whereclause[] = 'o.id_order = ' . (int)Tools::getValue('sj4webmargecommande_feesFilter_o!id_order');
+        }
+        return $whereclause;
+    }
 
 
 }
