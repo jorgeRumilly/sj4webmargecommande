@@ -18,83 +18,7 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         $sql = $this->getSqlOrderFees(true, false);
         $nb_orders = (int)Db::getInstance()->getValue($sql);
 
-        $page = max(1, (int)Tools::getValue('submitFiltersj4webmargecommande_fees', 1));
-        $limit = (int)Tools::getValue('sj4webmargecommande_fees_pagination', 20);
-        $offset = ($page - 1) * $limit;
-
-
-        // Requête brute : on récupère toutes les commandes
-//        $sql = $this->getSqlOrderFees(false, $offset, $limit);
-//        $orders = Db::getInstance()->executeS($sql);
-
-        $data = $this->getFilteredOrders($limit, $offset, true);
-
-//        $data = [];
-//        foreach ($orders as $orderRow) {
-//            $id_order = (int)$orderRow['id_order'];
-//
-//            // Crée un objet Order PrestaShop natif
-//            $order = new Order($id_order);
-//
-//            // Nb produits
-//            $nb_products = $this->getOrderNbProducts($id_order);
-//
-//            // Coût dropshipping via ton module existant
-//            $dropshippingFees = method_exists($this->module, 'calculateDropshippingFees')
-//                ? $this->module->calculateDropshippingFees($order)
-//                : 0;
-//
-//            // Coût d'achat total
-//            $costPrice = method_exists($this->module, 'getOrderCostPrice')
-//                ? $this->module->getOrderCostPrice($order)
-//                : 0;
-//
-//            // Commission TTC enregistrée
-//            $commissionTTC = method_exists($this->module, 'getPaymentFees')
-//                ? $this->module->getPaymentFees($id_order)
-//                : 0;
-//
-//            // Montants remboursements
-//            $refunds = $this->getOrderRefunds($id_order);
-//
-//            // Marge nette
-//            $margin = $order->total_paid_tax_excl - $order->total_shipping_tax_excl
-//                - $costPrice
-//                - $dropshippingFees
-//                - $commissionTTC;
-//
-//            $commission_percent = $order->total_paid_tax_incl > 0
-//                ? round($commissionTTC / $order->total_paid_tax_incl * 100, 2)
-//                : 0;
-//            $margin_rate = $costPrice > 0
-//                ? round($margin / $costPrice * 100, 2)
-//                : 0;
-//            $markup_rate = ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) > 0
-//                ? round($margin / ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) * 100, 2)
-//                : 0;
-//
-//
-//
-//            $data[] = [
-//                'id_order' => $id_order,
-//                'reference' => $orderRow['reference'],
-//                'date_add' => $orderRow['date_add'],
-//                'total_paid_tax_excl' => $orderRow['total_paid_tax_excl'],
-//                'total_paid_tax_incl' => $orderRow['total_paid_tax_incl'],
-//                'total_shipping_tax_excl' => $orderRow['total_shipping_tax_excl'],
-//                'total_shipping_tax_incl' => $orderRow['total_shipping_tax_incl'],
-//                'refund_products_ttc' => $refunds['products'],
-//                'refund_shipping_ttc' => $refunds['shipping'],
-//                'nb_products' => $nb_products,
-//                'payment_method' => $orderRow['payment'],
-//                'commission_ttc' => $commissionTTC,
-//                'dropshipping_fees' => $dropshippingFees,
-//                'margin' => $margin,
-//                'commission_percent' => $commission_percent,
-//                'margin_rate' => $margin_rate,
-//                'markup_rate' => $markup_rate,
-//            ];
-//        }
+        $data = $this->getFilteredOrders();
 
         $fields_list = [
             'id_order' => ['title' => 'ID', 'filter_key' => 'o!id_order', 'type' => 'int', 'callback' => 'renderLinkToOrder'],
@@ -115,6 +39,25 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
             'markup_rate' => ['title' => 'Taux de marque', 'suffix' => '%', 'search' => false, 'filter' => false,],
         ];
 
+        $baseIndex = AdminController::$currentIndex;
+        $token = Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees');
+        // Conserve les paramètres actifs
+//        $params = [];
+//        if (Tools::getValue('sj4webmargecommande_feesOrderby')) {
+//            $params['sj4webmargecommande_feesOrderby'] = Tools::getValue('sj4webmargecommande_feesOrderby');
+//        }
+//        if (Tools::getValue('sj4webmargecommande_feesOrderway')) {
+//            $params['sj4webmargecommande_feesOrderway'] = Tools::getValue('sj4webmargecommande_feesOrderway');
+//        }
+//        if (Tools::getValue('sj4webmargecommande_fees_pagination')) {
+//            $params['sj4webmargecommande_fees_pagination'] = Tools::getValue('sj4webmargecommande_fees_pagination');
+//        }
+
+        // Reconstruire currentIndex avec les paramètres persistés
+        $params = $this->getCurrentParams();
+        $queryString = http_build_query($params);
+        $currentIndex = $baseIndex . ($queryString ? '&' . $queryString : '');
+
         $helper = new HelperList();
         $helper->title = 'Marge Commande - Liste des commandes';
         $helper->shopLinkType = '';
@@ -123,8 +66,9 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         $helper->show_toolbar = true;
         $helper->module = $this->module;
         $helper->table = 'sj4webmargecommande_fees';
-        $helper->currentIndex = AdminController::$currentIndex;
-        $helper->token = Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees');
+        $helper->currentIndex = $currentIndex;
+//        $helper->token = Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees');
+        $helper->token = $token;
         $helper->listTotal = $nb_orders; // ou utilise SQL COUNT pour perf count($data)
         $helper->tpl_vars['pagination'] = [20, 50, 100, 300];
         $helper->tpl_vars['show_toolbar'] = true;
@@ -138,6 +82,29 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         $this->context->smarty->assign(['button_exel' => $button_exel]);
         $this->context->smarty->assign('content', $helper->generateList($data, $fields_list));
     }
+
+    protected function getCurrentParams(): array
+    {
+        $keys = [
+            'sj4webmargecommande_feesFilter_o!id_order',
+            'sj4webmargecommande_feesFilter_o!payment',
+            'sj4webmargecommande_feesFilter_o!date_add',
+            'sj4webmargecommande_feesOrderby',
+            'sj4webmargecommande_feesOrderway',
+            'sj4webmargecommande_fees_pagination',
+            'submitFiltersj4webmargecommande_fees',
+        ];
+
+        $params = [];
+        foreach ($keys as $key) {
+            if (Tools::getIsset($key)) {
+                $params[$key] = Tools::getValue($key);
+            }
+        }
+
+        return $params;
+    }
+
 
     public function renderList()
     {
@@ -175,11 +142,9 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
      */
     public function getSqlOrderFees(bool $count = false, $useLimits = true, int $offset = 0, int $limit = 50): string
     {
-
         $whereClause = $this->getWhereclause();
-
         $sql_select = 'SELECT ';
-        if($count) {
+        if ($count) {
             $sql_select .= 'COUNT(o.id_order) AS total';
         } else {
             $sql_select .= 'o.id_order, o.reference, o.date_add, 
@@ -189,25 +154,10 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         }
         $sql_from = ' FROM ' . _DB_PREFIX_ . 'orders o ';
         $sql_where = (count($whereClause) ? ' WHERE ' . implode(' AND ', $whereClause) : '');
-        $sql_order = ' ORDER BY o.date_add DESC ';
+        $sql_order = $this->getOrderClause();
+        $sql_order = (($sql_order) ?: ' ORDER BY o.date_add DESC ');
         $sql_limit = ($useLimits ? ' LIMIT ' . (int)$offset . ', ' . (int)$limit : '');
-
-        $sql = $sql_select . $sql_from . $sql_where . $sql_order . $sql_limit;
-
-//        if ($count) {
-//            $sql = 'SELECT COUNT(o.id_order) AS total
-//                    FROM ' . _DB_PREFIX_ . 'orders o';
-//            return $sql;
-//        };
-//
-//        $sql = 'SELECT o.id_order, o.reference, o.date_add,
-//                       o.total_paid_tax_excl, o.total_paid_tax_incl,
-//                       o.total_shipping_tax_excl, o.total_shipping_tax_incl,
-//                       o.payment
-//                FROM ' . _DB_PREFIX_ . 'orders o ' .
-//                (count($whereClause) ? ' WHERE ' . implode(' AND ', $whereClause) : '') .
-//            ' ORDER BY o.date_add DESC ' . ($useLimits ? 'LIMIT ' . (int)$offset . ', ' . (int)$limit : '');
-        return $sql;
+        return $sql_select . $sql_from . $sql_where . $sql_order . $sql_limit;
     }
 
     public static function renderLinkToOrder($id_order, $row)
@@ -248,13 +198,28 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
 
     public function getHtmlCsvButton()
     {
-        return '<a class="btn btn-default" href="' . AdminController::$currentIndex . '&export=1&token=' . Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees') . '"><i class="icon-download"></i> Export CSV</a>';
+        $params = array_merge(
+            $this->getCurrentParams(),
+            ['export' => 1]
+        );
+        $query = http_build_query($params);
+        $url = AdminController::$currentIndex . '&' . $query . '&token=' . Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees');
+
+        return '<a class="btn btn-default" href="' . $url . '"><i class="icon-download"></i> Export CSV</a>';
     }
 
     public function postProcess()
     {
         if (Tools::getIsset('export')) {
             $this->exportCsv();
+        }
+        if (Tools::isSubmit('submitResetsj4webmargecommande_fees')) {
+            $_GET = array_filter($_GET, function ($key) {
+                return strpos($key, 'sj4webmargecommande_feesFilter_') === false;
+            }, ARRAY_FILTER_USE_KEY);
+            $_POST = array_filter($_POST, function ($key) {
+                return strpos($key, 'sj4webmargecommande_feesFilter_') === false;
+            }, ARRAY_FILTER_USE_KEY);
         }
     }
 
@@ -286,7 +251,9 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         ];
         fputcsv($output, $headers);
 
-        foreach ($this->getFilteredOrders(0, 0, false) as $row) {
+        $data = $this->getFilteredOrders(true);
+
+        foreach ($data as $row) {
             fputcsv($output, [
                 $row['id_order'],
                 $row['date_add'],
@@ -312,9 +279,20 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
     }
 
 
-    protected function getFilteredOrders($limit, $offset, $useLimits = true): array
+    /**
+     * Get filtered orders based on the current filters and pagination.
+     * @param bool $useLimits
+     * @return array
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    protected function getFilteredOrders(bool $useLimits = true): array
     {
-        // 💡 c’est juste le même bloc que dans renderList()
+
+        $page = max(1, (int)Tools::getValue('submitFiltersj4webmargecommande_fees', 1));
+        $limit = (int)Tools::getValue('sj4webmargecommande_fees_pagination', 20);
+        $offset = ($page - 1) * $limit;
+
         // Requête brute : on récupère toutes les commandes
         $sql = $this->getSqlOrderFees(false, $useLimits, $offset, $limit);
         $orders = Db::getInstance()->executeS($sql);
@@ -325,31 +303,25 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
             $order = new Order($id_order);
             // Nb produits
             $nb_products = $this->getOrderNbProducts($id_order);
-
             // Coût dropshipping via ton module existant
             $dropshippingFees = method_exists($this->module, 'calculateDropshippingFees')
                 ? $this->module->calculateDropshippingFees($order)
                 : 0;
-
             // Coût d'achat total
             $costPrice = method_exists($this->module, 'getOrderCostPrice')
                 ? $this->module->getOrderCostPrice($order)
                 : 0;
-
             // Commission TTC enregistrée
             $commissionTTC = method_exists($this->module, 'getPaymentFees')
                 ? $this->module->getPaymentFees($id_order)
                 : 0;
-
             // Montants remboursements
             $refunds = $this->getOrderRefunds($id_order);
-
             // Marge nette
             $margin = $order->total_paid_tax_excl - $order->total_shipping_tax_excl
                 - $costPrice
                 - $dropshippingFees
                 - $commissionTTC;
-
             $commission_percent = $order->total_paid_tax_incl > 0
                 ? round($commissionTTC / $order->total_paid_tax_incl * 100, 2)
                 : 0;
@@ -359,25 +331,6 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
             $markup_rate = ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) > 0
                 ? round($margin / ($order->total_paid_tax_excl - $order->total_shipping_tax_excl) * 100, 2)
                 : 0;
-
-//            $data[] = [
-//                'id_order'            => $id_order,
-//                'date_add'            => $orderRow['date_add'],
-//                'total_paid_tax_excl' => $order->total_paid_tax_excl,
-//                'total_paid_tax_incl' => $order->total_paid_tax_incl,
-//                'total_shipping_tax_excl' => $order->total_shipping_tax_excl,
-//                'total_shipping_tax_incl' => $order->total_shipping_tax_incl,
-//                'refund_products_ttc' => $refunds['products'],
-//                'refund_shipping_ttc' => $refunds['shipping'],
-//                'nb_products'         => $nb_products,
-//                'payment_method'      => $orderRow['payment'],
-//                'commission_ttc'      => $commissionTTC,
-//                'commission_percent'  => $prix_vente_ht > 0 ? round($commissionTTC / $prix_vente_ht * 100, 2) : 0,
-//                'dropshipping_fees'   => $dropshippingFees,
-//                'margin'              => $marge,
-//                'margin_rate'         => $costPrice > 0 ? round($marge / $costPrice * 100, 2) : 0,
-//                'markup_rate'         => $prix_vente_ht > 0 ? round($marge / $prix_vente_ht * 100, 2) : 0,
-//            ];
 
             $data[] = [
                 'id_order' => $id_order,
@@ -389,7 +342,7 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
                 'refund_products_ttc' => $refunds['products'],
                 'refund_shipping_ttc' => $refunds['shipping'],
                 'nb_products' => $nb_products,
-                'payment_method' => $orderRow['payment'],
+                'payment_method' => $orderRow['payment_method'],
                 'commission_ttc' => $commissionTTC,
                 'dropshipping_fees' => $dropshippingFees,
                 'margin' => $margin,
@@ -397,10 +350,10 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
                 'margin_rate' => $margin_rate,
                 'markup_rate' => $markup_rate,
             ];
-
         }
 
-        return $data;
+        // Tri des entrées
+        return $this->sortEntries($data);
     }
 
     /**
@@ -429,5 +382,63 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         return $whereclause;
     }
 
+    /**
+     * Get the SQL ORDER BY clause based on user input.
+     * @return string
+     */
+    public function getOrderClause()
+    {
+        $orderby = Tools::getValue('sj4webmargecommande_feesOrderby');
+        $orderway = strtolower(Tools::getValue('sj4webmargecommande_feesOrderway', 'DESC')) === 'desc' ? SORT_DESC : SORT_ASC;
+        if (!$orderby) {
+            return '';
+        }
+        if (!in_array($orderby, ['id_order', 'date_add', 'total_paid_tax_excl', 'total_paid_tax_incl', 'total_shipping_tax_excl', 'total_shipping_tax_incl', 'payment_method'])) {
+            return '';
+        }
+        if (strtolower($orderby) === 'payment_method') {
+            $orderby = 'payment';
+        }
+
+        return ' ORDER BY o.' . pSQL($orderby) . ' ' . ($orderway === SORT_DESC ? 'DESC' : 'ASC');
+    }
+
+    /**
+     * Sort the entries based on user input.
+     * @param array $entries
+     * @return array
+     */
+    public function sortEntries(array $entries): array
+    {
+        $orderby = Tools::getValue('sj4webmargecommande_feesOrderby');
+        $orderway = strtolower(Tools::getValue('sj4webmargecommande_feesOrderway', 'DESC')) === 'desc' ? SORT_DESC : SORT_ASC;
+        if (!$orderby) {
+            return $entries;
+        }
+        if (!in_array($orderby, ['refund_products_ttc', 'refund_shipping_ttc', 'nb_products', 'commission_ttc', 'commission_percent', 'dropshipping_fees', 'margin', 'margin_rate', 'markup_rate'])) {
+            return $entries;
+        }
+
+        usort($entries, function ($a, $b) use ($orderby, $orderway) {
+            $valA = $a[$orderby];
+            $valB = $b[$orderby];
+
+            if (is_numeric($valA) && is_numeric($valB)) {
+                return $orderway === SORT_DESC ? $valB <=> $valA : $valA <=> $valB;
+            } else {
+                // Suppression des espaces, € et % pour comparer les valeurs formatées
+                $cleanA = str_replace(['€', '%', ' ', ','], ['', '', '', '.'], $valA);
+                $cleanB = str_replace(['€', '%', ' ', ','], ['', '', '', '.'], $valB);
+                if (is_numeric($cleanA) && is_numeric($cleanB)) {
+                    return $orderway === SORT_DESC ? $cleanB <=> $cleanA : $cleanA <=> $cleanB;
+                }
+                return $orderway === SORT_DESC ? strcmp($valB, $valA) : strcmp($valA, $valB);
+            }
+
+        });
+
+        return $entries;
+
+    }
 
 }
