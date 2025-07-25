@@ -42,16 +42,6 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         $baseIndex = AdminController::$currentIndex;
         $token = Tools::getAdminTokenLite('AdminSj4webMargeCommandeFees');
         // Conserve les paramètres actifs
-//        $params = [];
-//        if (Tools::getValue('sj4webmargecommande_feesOrderby')) {
-//            $params['sj4webmargecommande_feesOrderby'] = Tools::getValue('sj4webmargecommande_feesOrderby');
-//        }
-//        if (Tools::getValue('sj4webmargecommande_feesOrderway')) {
-//            $params['sj4webmargecommande_feesOrderway'] = Tools::getValue('sj4webmargecommande_feesOrderway');
-//        }
-//        if (Tools::getValue('sj4webmargecommande_fees_pagination')) {
-//            $params['sj4webmargecommande_fees_pagination'] = Tools::getValue('sj4webmargecommande_fees_pagination');
-//        }
 
         // Reconstruire currentIndex avec les paramètres persistés
         $params = $this->getCurrentParams();
@@ -80,6 +70,16 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         $helper->orderWay = 'DESC';
         $button_exel = $this->getHtmlCsvButton();
         $this->context->smarty->assign(['button_exel' => $button_exel]);
+        $this->context->smarty->assign('custom_filters', [
+            'filter_min_total_ttc' => Tools::getValue('filter_min_total_ttc'),
+            'filter_max_total_ttc' => Tools::getValue('filter_max_total_ttc'),
+            'filter_min_margin_rate' => Tools::getValue('filter_min_margin_rate'),
+            'filter_max_margin_rate' => Tools::getValue('filter_max_margin_rate'),
+            'filter_min_commission_percent' => Tools::getValue('filter_min_commission_percent'),
+            'filter_max_commission_percent' => Tools::getValue('filter_max_commission_percent'),
+            'filter_min_fees_rate' => Tools::getValue('filter_min_fees_rate'),
+            'filter_max_fees_rate' => Tools::getValue('filter_max_fees_rate'),
+        ]);
         $this->context->smarty->assign('content', $helper->generateList($data, $fields_list));
     }
 
@@ -294,7 +294,8 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         $offset = ($page - 1) * $limit;
 
         // Requête brute : on récupère toutes les commandes
-        $sql = $this->getSqlOrderFees(false, $useLimits, $offset, $limit);
+        $disableLimit = $this->isSortOnComputedField();
+        $sql = $this->getSqlOrderFees(false, !$disableLimit, $offset, $limit);
         $orders = Db::getInstance()->executeS($sql);
         $data = [];
 
@@ -352,8 +353,16 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
             ];
         }
 
+        // selection des champs calculés
+        $data = $this->filterEntries($data);
+
         // Tri des entrées
-        return $this->sortEntries($data);
+        $data = $this->sortEntries($data);
+        if ($disableLimit) {
+            /* Pagination dans le cas de tri sur les champs calculés */
+            $data = array_slice($data, $offset, $limit);
+        }
+        return $data;
     }
 
     /**
@@ -362,6 +371,9 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
     public function getWhereclause(): array
     {
         $whereclause = [];
+
+        $whereclause[] = 'o.valid = 1'; // au minimum on ne prend que les commandes validées
+
         if (Tools::getIsset('sj4webmargecommande_feesFilter_o!payment') && Tools::getValue('sj4webmargecommande_feesFilter_o!payment') !== '') {
             $whereclause[] = 'o.payment LIKE \'%' . pSQL(Tools::getValue('sj4webmargecommande_feesFilter_o!payment')) . '%\'';
         }
@@ -379,7 +391,53 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         if (Tools::getIsset('sj4webmargecommande_feesFilter_o!id_order') && Tools::getValue('sj4webmargecommande_feesFilter_o!id_order') !== '') {
             $whereclause[] = 'o.id_order = ' . (int)Tools::getValue('sj4webmargecommande_feesFilter_o!id_order');
         }
+        if (Tools::getIsset('filter_min_total_ttc') && Tools::getValue('filter_min_total_ttc') !== '') {
+            $whereclause[] = 'o.total_paid_tax_incl >= ' . (float)Tools::getValue('filter_min_total_ttc');
+        }
+        if (Tools::getIsset('filter_max_total_ttc') && Tools::getValue('filter_max_total_ttc') !== '') {
+            $whereclause[] = 'o.total_paid_tax_incl <= ' . (float)Tools::getValue('filter_max_total_ttc');
+        }
+
         return $whereclause;
+    }
+
+    public function filterEntries($data): array
+    {
+        $filteredData = [];
+        $minMarginRate = Tools::getValue('filter_min_margin_rate', -1000);
+        $maxMarginRate = Tools::getValue('filter_max_margin_rate', 1000);
+        $minCommissionPercent = Tools::getValue('filter_min_commission_percent', -1000);
+        $maxCommissionPercent = Tools::getValue('filter_max_commission_percent', 1000);
+        $minFeesRate = Tools::getValue('filter_min_fees_rate', -1000);
+        $maxFeesRate = Tools::getValue('filter_max_fees_rate', 1000);
+
+        // Si tous les filtres sont à leur valeur par défaut, on retourne $data directement
+        if (
+            $minMarginRate == -1000 && $maxMarginRate == 1000 &&
+            $minCommissionPercent == -1000 && $maxCommissionPercent == 1000 &&
+            $minFeesRate == -1000 && $maxFeesRate == 1000
+        ) {
+            return $data;
+        }
+        $filteredData = [];
+        foreach ($data as $row) {
+            $marginRate = floatval(str_replace(['%', ' ', ','], ['', '', '.'], $row['margin_rate']));
+            $commissionPercent = floatval(str_replace(['%', ' ', ','], ['', '', '.'], $row['commission_percent']));
+            $markupRate = floatval(str_replace(['%', ' ', ','], ['', '', '.'], $row['markup_rate']));
+
+            if ($marginRate < $minMarginRate || $marginRate > $maxMarginRate) {
+                continue;
+            }
+            if ($commissionPercent < $minCommissionPercent || $commissionPercent > $maxCommissionPercent) {
+                continue;
+            }
+            if ($markupRate < $minFeesRate || $markupRate > $maxFeesRate) {
+                continue;
+            }
+            $filteredData[] = $row;
+        }
+
+        return $filteredData;
     }
 
     /**
@@ -440,5 +498,26 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
         return $entries;
 
     }
+
+    /**
+     * Check if the current sort is on a computed field.
+     * @return bool
+     */
+    protected function isSortOnComputedField(): bool
+    {
+        $orderby = Tools::getValue('sj4webmargecommande_feesOrderby');
+        return in_array($orderby, [
+            'refund_products_ttc',
+            'refund_shipping_ttc',
+            'nb_products',
+            'commission_ttc',
+            'commission_percent',
+            'dropshipping_fees',
+            'margin',
+            'margin_rate',
+            'markup_rate'
+        ]);
+    }
+
 
 }

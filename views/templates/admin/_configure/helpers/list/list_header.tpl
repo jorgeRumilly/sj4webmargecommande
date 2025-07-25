@@ -24,6 +24,62 @@
 *}
 
 {extends file="helpers/list/list_header.tpl"}
+
 {block name="preTable"}
-    {$button_exel}
+
+    {* Formulaire de filtres personnalisés *}
+    <form method="post" class="form-horizontal" id="advanced_filters_form">
+        <div class="panel">
+            <div class="panel-heading">Filtres avancés</div>
+            <div class="form-wrapper">
+                <div class="form-group">
+                    <label class="control-label col-lg-2">Total TTC entre</label>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" name="filter_min_total_ttc" value="{$custom_filters.filter_min_total_ttc}" />
+                    </div>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" name="filter_max_total_ttc" value="{$custom_filters.filter_max_total_ttc}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-2">% Marge entre</label>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" name="filter_min_margin_rate" value="{$custom_filters.filter_min_margin_rate}" />
+                    </div>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" name="filter_max_margin_rate" value="{$custom_filters.filter_max_margin_rate}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-2">% Commission entre</label>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" name="filter_min_commission_percent" value="{$custom_filters.filter_min_commission_percent}" />
+                    </div>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" name="filter_max_commission_percent" value="{$custom_filters.filter_max_commission_percent}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-2">% Frais totaux entre</label>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" name="filter_min_fees_rate" value="{$custom_filters.filter_min_fees_rate}" />
+                    </div>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" name="filter_max_fees_rate" value="{$custom_filters.filter_max_fees_rate}" />
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer text-right">
+                <button type="submit" name="submitFiltersj4webmargecommande_fees" class="btn btn-default">
+                    <i class="icon-search"></i> Appliquer
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {* Bouton export existant *}
+    <div class="pull-right" style="margin-top: 10px;">
+        {$button_exel}
+    </div>
+
 {/block}
