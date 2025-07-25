@@ -403,7 +403,6 @@ class AdminSj4webMargeCommandeFeesController extends ModuleAdminController
 
     public function filterEntries($data): array
     {
-        $filteredData = [];
         $minMarginRate = Tools::getValue('filter_min_margin_rate', -1000);
         $maxMarginRate = Tools::getValue('filter_max_margin_rate', 1000);
         $minCommissionPercent = Tools::getValue('filter_min_commission_percent', -1000);
