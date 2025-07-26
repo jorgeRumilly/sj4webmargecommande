@@ -70,6 +70,10 @@
                 </div>
             </div>
             <div class="panel-footer text-right">
+                <button type="submit" name="submitResetsj4webmargecommande_fees" class="btn btn-default">
+                    <i class="icon-remove"></i> Réinitialiser
+                </button>
+
                 <button type="submit" name="submitFiltersj4webmargecommande_fees" class="btn btn-default">
                     <i class="icon-search"></i> Appliquer
                 </button>
