@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
     <name>sj4webmargecommande</name>
-    <displayName><![CDATA[SJ4WEB - Marge dropshipping]]></displayName>
-    <version><![CDATA[1.0.0]]></version>
-    <description><![CDATA[Permet d'afficher la marge de la commande.]]></description>
+    <displayName><![CDATA[SJ4WEB - Order margin]]></displayName>
+    <version><![CDATA[2.0.2]]></version>
+    <description><![CDATA[Theoretical order margin: revenue - purchase cost - dropshipping cost - payment commission.]]></description>
     <author><![CDATA[SJ4WEB.FR]]></author>
     <tab><![CDATA[administration]]></tab>
-    <confirmUninstall><![CDATA[Are you sure to uninstall this module ?]]></confirmUninstall>
+    <confirmUninstall><![CDATA[Uninstall? The margin rules and cache are removed; order_fees is kept.]]></confirmUninstall>
     <is_configurable>1</is_configurable>
     <need_instance>0</need_instance>
 </module>

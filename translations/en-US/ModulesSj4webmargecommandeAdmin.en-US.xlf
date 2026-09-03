@@ -1,0 +1,423 @@
+<?xml version='1.0' encoding='utf-8'?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en-US" target-language="en-US" datatype="plaintext" original="file.ext">
+    <body>
+      <trans-unit id="202b2d049ab1e71bcaed4040935e752d">
+        <source>SJ4WEB - Order margin</source>
+        <target>SJ4WEB - Order margin</target>
+      </trans-unit>
+      <trans-unit id="52c6e5cfe8017f692d8c01b1e34994ad">
+        <source>Theoretical order margin: revenue - purchase cost - dropshipping cost - payment commission.</source>
+        <target>Theoretical order margin: revenue - purchase cost - dropshipping cost - payment commission.</target>
+      </trans-unit>
+      <trans-unit id="d2a8348131bfb9f60c47dc2ab4ba9686">
+        <source>Uninstall? The margin rules and cache are removed; order_fees is kept.</source>
+        <target>Uninstall? The margin rules and cache are removed; order_fees is kept.</target>
+      </trans-unit>
+      <trans-unit id="aac6d37453f290dae9bafc7f2890b9ec">
+        <source>Order margins</source>
+        <target>Order margins</target>
+      </trans-unit>
+      <trans-unit id="ac9b7b70c9e408c4829fd9af662b6cba">
+        <source>Dropshipping cost rules</source>
+        <target>Dropshipping cost rules</target>
+      </trans-unit>
+      <trans-unit id="f4f70727dc34561dfde1a3c529b6205c">
+        <source>Settings</source>
+        <target>Settings</target>
+      </trans-unit>
+      <trans-unit id="c9cc8cce247e49bae79f15173ce97354">
+        <source>Save</source>
+        <target>Save</target>
+      </trans-unit>
+      <trans-unit id="f38f5974cdc23279ffe6d203641a8bdf">
+        <source>Settings updated.</source>
+        <target>Settings updated.</target>
+      </trans-unit>
+      <trans-unit id="66dff4bc6149738292b7b2737e7e2e8c">
+        <source>Invalid security token.</source>
+        <target>Invalid security token.</target>
+      </trans-unit>
+      <trans-unit id="b6d56054a6b40c5cba0d227802ea0ac8">
+        <source>Invalid values.</source>
+        <target>Invalid values.</target>
+      </trans-unit>
+      <trans-unit id="433cd9d341d057d1ba11b24ebd4e3926">
+        <source>Cron token regenerated.</source>
+        <target>Cron token regenerated.</target>
+      </trans-unit>
+      <trans-unit id="705401e63cad6f6a9353b75405db4a7f">
+        <source>Cron rolling window (days)</source>
+        <target>Cron rolling window (days)</target>
+      </trans-unit>
+      <trans-unit id="8093fd8e8a061e9061581b60bc5287a6">
+        <source>Each cron run recomputes valid orders placed within this many days (absorbs late fees / refunds).</source>
+        <target>Each cron run recomputes valid orders placed within this many days (absorbs late fees / refunds).</target>
+      </trans-unit>
+      <trans-unit id="a9ac0ef23a492bd444a041d313ff2e61">
+        <source>Net margin: green threshold</source>
+        <target>Net margin: green threshold</target>
+      </trans-unit>
+      <trans-unit id="2ad3c884ae381ee0009632a3b6e88f6a">
+        <source>Net margin: orange threshold</source>
+        <target>Net margin: orange threshold</target>
+      </trans-unit>
+      <trans-unit id="f122e6a7223f070dc0967c4f7bca8785">
+        <source>Recompute done: %d orders, %d skipped.</source>
+        <target>Recompute done: %d orders, %d skipped.</target>
+      </trans-unit>
+      <trans-unit id="5449c0e193233bab39bbc080262fb570">
+        <source>Recompute failed:</source>
+        <target>Recompute failed:</target>
+      </trans-unit>
+      <trans-unit id="28a6b448cdbc833ae0a8dbea205464f0">
+        <source>Margin cache &amp; tools</source>
+        <target>Margin cache &amp; tools</target>
+      </trans-unit>
+      <trans-unit id="ec1ee973b8947391f8f014c76ac7379f">
+        <source>Valid orders</source>
+        <target>Valid orders</target>
+      </trans-unit>
+      <trans-unit id="f9171fc6b244181030588ac396205ab6">
+        <source>In cache</source>
+        <target>In cache</target>
+      </trans-unit>
+      <trans-unit id="2aee0be2678ee90fd327cc186826438e">
+        <source>Missing</source>
+        <target>Missing</target>
+      </trans-unit>
+      <trans-unit id="e16aeb0ad824101f88bd8bc222b6be94">
+        <source>Incomplete purchase cost</source>
+        <target>Incomplete purchase cost</target>
+      </trans-unit>
+      <trans-unit id="08816fc825ecf03ab83736b112fbd8a2">
+        <source>Compute missing</source>
+        <target>Compute missing</target>
+      </trans-unit>
+      <trans-unit id="4a5b4097bb447c522992f16877246af5">
+        <source>Rebuild all</source>
+        <target>Rebuild all</target>
+      </trans-unit>
+      <trans-unit id="56b7ece7008a6c810002c4323d552227">
+        <source>Rebuild the whole margin cache?</source>
+        <target>Rebuild the whole margin cache?</target>
+      </trans-unit>
+      <trans-unit id="1d667ac0c6f1210c8ebdc12ef121d2ca">
+        <source>Order margins list</source>
+        <target>Order margins list</target>
+      </trans-unit>
+      <trans-unit id="1b793db6c00482d633b29701c7bcb08c">
+        <source>Cron</source>
+        <target>Cron</target>
+      </trans-unit>
+      <trans-unit id="a1ce37ee83089e90a2c9c5614f9e4b36">
+        <source>Schedule once a day:</source>
+        <target>Schedule once a day:</target>
+      </trans-unit>
+      <trans-unit id="6fa3788442cbac8fdc163cbdaf9fc8fa">
+        <source>Regenerate the cron token?</source>
+        <target>Regenerate the cron token?</target>
+      </trans-unit>
+      <trans-unit id="580ca5fd5f629e784a0d32c9115d9cfd">
+        <source>Regenerate token</source>
+        <target>Regenerate token</target>
+      </trans-unit>
+      <trans-unit id="98369609669478919c74c916440e9978">
+        <source>Margin</source>
+        <target>Margin</target>
+      </trans-unit>
+      <trans-unit id="f0aaaae189e9c7711931a65ffcd22543">
+        <source>Payment method</source>
+        <target>Payment method</target>
+      </trans-unit>
+      <trans-unit id="f228421e097227de08006fa193e4983b">
+        <source>Net revenue (HT, after vouchers/refunds)</source>
+        <target>Net revenue (HT, after vouchers/refunds)</target>
+      </trans-unit>
+      <trans-unit id="e9cbcb4311823784753a559fb51df133">
+        <source>Purchase cost (HT)</source>
+        <target>Purchase cost (HT)</target>
+      </trans-unit>
+      <trans-unit id="63d9a0291987887430b4984cc04dc74e">
+        <source>Some order lines have no supplier purchase price</source>
+        <target>Some order lines have no supplier purchase price</target>
+      </trans-unit>
+      <trans-unit id="5ed4e9858ad8d239145ef285b6210a00">
+        <source>incomplete</source>
+        <target>incomplete</target>
+      </trans-unit>
+      <trans-unit id="0d4a92e20bd57a29733c4352dda67ced">
+        <source>Dropshipping cost (HT)</source>
+        <target>Dropshipping cost (HT)</target>
+      </trans-unit>
+      <trans-unit id="177966b87348f76673a4ede476c25817">
+        <source>Payment commission (HT)</source>
+        <target>Payment commission (HT)</target>
+      </trans-unit>
+      <trans-unit id="2cd42a949876e2b230adcbff5b6d0432">
+        <source>Net margin</source>
+        <target>Net margin</target>
+      </trans-unit>
+      <trans-unit id="196a2bc96aabaa99c050aa336d01469b">
+        <source>markup</source>
+        <target>markup</target>
+      </trans-unit>
+      <trans-unit id="0f31ba2a3f648151e72d046cc6d3356d">
+        <source>margin rate</source>
+        <target>margin rate</target>
+      </trans-unit>
+      <trans-unit id="d19c292d183a2c9b266837b75ac2491a">
+        <source>Refunds deducted</source>
+        <target>Refunds deducted</target>
+      </trans-unit>
+      <trans-unit id="86024cad1e83101d97359d7351051156">
+        <source>products</source>
+        <target>products</target>
+      </trans-unit>
+      <trans-unit id="83858084d0b71ba9a045833e313ef523">
+        <source>Dropshipping cost rules per supplier</source>
+        <target>Dropshipping cost rules per supplier</target>
+      </trans-unit>
+      <trans-unit id="ec136b444eede3bc85639fac0dd06229">
+        <source>Supplier</source>
+        <target>Supplier</target>
+      </trans-unit>
+      <trans-unit id="ab7a485ebe75b6dd7243ad719f23c7de">
+        <source>Rule</source>
+        <target>Rule</target>
+      </trans-unit>
+      <trans-unit id="4d3d769b812b6faa6b76e1a8abaece2d">
+        <source>Active</source>
+        <target>Active</target>
+      </trans-unit>
+      <trans-unit id="7dce122004969d56ae2e0245cb754d35">
+        <source>Edit</source>
+        <target>Edit</target>
+      </trans-unit>
+      <trans-unit id="a6105c0a611b41b08f1209506350279e">
+        <source>yes</source>
+        <target>yes</target>
+      </trans-unit>
+      <trans-unit id="7fa3b767c460b54a2be4d49030b349c7">
+        <source>no</source>
+        <target>no</target>
+      </trans-unit>
+      <trans-unit id="3866149eecb4ce9c57a3c04a8a54f859">
+        <source>Rule for supplier</source>
+        <target>Rule for supplier</target>
+      </trans-unit>
+      <trans-unit id="c95bb47cd21cedd750534c9e44093a46">
+        <source>Rule type</source>
+        <target>Rule type</target>
+      </trans-unit>
+      <trans-unit id="d29730d0d67dc0a87a313bd5b7b35cd9">
+        <source>Percent of supplier products HT</source>
+        <target>Percent of supplier products HT</target>
+      </trans-unit>
+      <trans-unit id="ca6b2a53f366bb8fb894ea31ce6d0e73">
+        <source>Fixed amount per order (HT)</source>
+        <target>Fixed amount per order (HT)</target>
+      </trans-unit>
+      <trans-unit id="c5839f885e0acd591efd1c674ca1ad2f">
+        <source>Quantity steps</source>
+        <target>Quantity steps</target>
+      </trans-unit>
+      <trans-unit id="df1c192e4c9160cec14e6542ccd662e4">
+        <source>First step whose &quot;max qty&quot; is &gt;= the supplier quantity in the order wins.</source>
+        <target>First step whose &quot;max qty&quot; is &gt;= the supplier quantity in the order wins.</target>
+      </trans-unit>
+      <trans-unit id="c60a19e5b0741ec884118fad373b45c3">
+        <source>Max qty</source>
+        <target>Max qty</target>
+      </trans-unit>
+      <trans-unit id="68eef149e92e94d2bdf3a12da9748f9a">
+        <source>Amount HT</source>
+        <target>Amount HT</target>
+      </trans-unit>
+      <trans-unit id="5185d252c6c0fc531d7ddf581f1f3767">
+        <source>Add step</source>
+        <target>Add step</target>
+      </trans-unit>
+      <trans-unit id="1c25177be3c32373fadba0be35dbd83c">
+        <source>Type buckets</source>
+        <target>Type buckets</target>
+      </trans-unit>
+      <trans-unit id="801edab9e060cbc09f799a6e19fb7029">
+        <source>One flat amount is added per bucket that has at least one matching product in the order (quantity ignored). A product matches a bucket when one of its categories is a selected category or a descendant of it.</source>
+        <target>One flat amount is added per bucket that has at least one matching product in the order (quantity ignored). A product matches a bucket when one of its categories is a selected category or a descendant of it.</target>
+      </trans-unit>
+      <trans-unit id="b021df6aac4654c454f46c77646e745f">
+        <source>Label</source>
+        <target>Label</target>
+      </trans-unit>
+      <trans-unit id="af1b98adf7f686b84cd0b443e022b7a0">
+        <source>Categories</source>
+        <target>Categories</target>
+      </trans-unit>
+      <trans-unit id="db356f0254563409d9a3427d2a345665">
+        <source>Add bucket</source>
+        <target>Add bucket</target>
+      </trans-unit>
+      <trans-unit id="0557fa923dcee4d0f86b1409f5c2167f">
+        <source>Back</source>
+        <target>Back</target>
+      </trans-unit>
+      <trans-unit id="f2a6c498fb90ee345d997f888fce3b18">
+        <source>Delete</source>
+        <target>Delete</target>
+      </trans-unit>
+      <trans-unit id="d83490a51968f985617f4dd6a2989aa2">
+        <source>Delete this rule?</source>
+        <target>Delete this rule?</target>
+      </trans-unit>
+      <trans-unit id="d9c3a508aadc89c987a08811138836e2">
+        <source>Advanced filters</source>
+        <target>Advanced filters</target>
+      </trans-unit>
+      <trans-unit id="2942c466ae985c4fe2d8cc9d0c801501">
+        <source>between</source>
+        <target>between</target>
+      </trans-unit>
+      <trans-unit id="526d688f37a86d3c3f27d0c5016eb71d">
+        <source>Reset</source>
+        <target>Reset</target>
+      </trans-unit>
+      <trans-unit id="9639e32cab248434a17ab32237cb3b71">
+        <source>Apply</source>
+        <target>Apply</target>
+      </trans-unit>
+      <trans-unit id="81513effdf5790b79549208838404407">
+        <source>loss</source>
+        <target>loss</target>
+      </trans-unit>
+      <trans-unit id="e5a0f5e51d046ac4f27fb9d8531e980a">
+        <source>Net revenue (HT, shipping incl., after vouchers/refunds)</source>
+        <target>Net revenue (HT, shipping incl., after vouchers/refunds)</target>
+      </trans-unit>
+      <trans-unit id="a3ff23585a28933d7754f95f987108fb">
+        <source>Supplier cost (drop + shipping, HT)</source>
+        <target>Supplier cost (drop + shipping, HT)</target>
+      </trans-unit>
+      <trans-unit id="e5a6998ca347fe9974ea34cc24864dc7">
+        <source>Real shipping not entered for at least one supplier</source>
+        <target>Real shipping not entered for at least one supplier</target>
+      </trans-unit>
+      <trans-unit id="df80cfed9b6e14f8554a97dc2ce39a3b">
+        <source>shipping est.</source>
+        <target>shipping est.</target>
+      </trans-unit>
+      <trans-unit id="ca5cb40c671172f6bdd285a2bb2e078a">
+        <source>real, all-in</source>
+        <target>real, all-in</target>
+      </trans-unit>
+      <trans-unit id="1d0628c1465560a3a3397581d12cf447">
+        <source>est., all-in</source>
+        <target>est., all-in</target>
+      </trans-unit>
+      <trans-unit id="6e9d25362c485bc3c90c818dfac5dc49">
+        <source>drop</source>
+        <target>drop</target>
+      </trans-unit>
+      <trans-unit id="7b74e940a55371e56aeb961f1ccb695c">
+        <source>est.</source>
+        <target>est.</target>
+      </trans-unit>
+      <trans-unit id="31211b6813083b13df997b9e3abbbd2b">
+        <source>shipping</source>
+        <target>shipping</target>
+      </trans-unit>
+      <trans-unit id="306c150bcddb107dfb1837d891fda513">
+        <source>Shipping charged</source>
+        <target>Shipping charged</target>
+      </trans-unit>
+      <trans-unit id="225403b58e2f04164bb0990392d1e6a0">
+        <source>shipping paid</source>
+        <target>shipping paid</target>
+      </trans-unit>
+      <trans-unit id="468962c06c44024dd25a6a9e18d49bbe">
+        <source>Real shipping paid, per supplier (HT)</source>
+        <target>Real shipping paid, per supplier (HT)</target>
+      </trans-unit>
+      <trans-unit id="75b60e4aa5c0ad38815df6a6ef095aba">
+        <source>drop covers shipping — enter the real all-in</source>
+        <target>drop covers shipping — enter the real all-in</target>
+      </trans-unit>
+      <trans-unit id="d8fd5602f78b0248b1aea75a82ab139b">
+        <source>drop est.</source>
+        <target>drop est.</target>
+      </trans-unit>
+      <trans-unit id="4bca24304861acde5770fdbe3cc2503b">
+        <source>real</source>
+        <target>real</target>
+      </trans-unit>
+      <trans-unit id="aad653ca3ee669635f2938b73098b6d7">
+        <source>note</source>
+        <target>note</target>
+      </trans-unit>
+      <trans-unit id="b8d36683c6bbbd157cf6be01554adb64">
+        <source>Save &amp; recompute</source>
+        <target>Save &amp; recompute</target>
+      </trans-unit>
+      <trans-unit id="9576b8776b752c3e36262a4dc8c93f01">
+        <source>Drop fee already covers shipping</source>
+        <target>Drop fee already covers shipping</target>
+      </trans-unit>
+      <trans-unit id="2cc4ba30cf3d469d17ca35ee0c0b0c50">
+        <source>ON (e.g. Castex): the rule amount is the all-in cost, no shipping added on top. OFF: shipping is billed separately and entered per order.</source>
+        <target>ON (e.g. Castex): the rule amount is the all-in cost, no shipping added on top. OFF: shipping is billed separately and entered per order.</target>
+      </trans-unit>
+      <trans-unit id="99d1811aafcf152d2069904af937f347">
+        <source>shipping incl.</source>
+        <target>shipping incl.</target>
+      </trans-unit>
+      <trans-unit id="b46fab183b23a36c39a54ce8b767e8ef">
+        <source>Percent base</source>
+        <target>Percent base</target>
+      </trans-unit>
+      <trans-unit id="7477b1c506eea92f1dbd5ebe024f24ef">
+        <source>Purchase price (excl. shipping)</source>
+        <target>Purchase price (excl. shipping)</target>
+      </trans-unit>
+      <trans-unit id="551b61d0306fc4d33a5bc660824b196d">
+        <source>Our selling price HT (before coupons, excl. shipping)</source>
+        <target>Our selling price HT (before coupons, excl. shipping)</target>
+      </trans-unit>
+      <trans-unit id="dadae02bf118fce3ff734fd7864cc159">
+        <source>Computed on non-refunded quantities only.</source>
+        <target>Computed on non-refunded quantities only.</target>
+      </trans-unit>
+      <trans-unit id="e38257909b78891f10a8d04ba654abfa">
+        <source>on selling price</source>
+        <target>on selling price</target>
+      </trans-unit>
+      <trans-unit id="03d468aae8568c9337326370ed940060">
+        <source>on purchase price</source>
+        <target>on purchase price</target>
+      </trans-unit>
+      <trans-unit id="a96642859a4c6e824fdd0be48fc028be">
+        <source>store credit</source>
+        <target>store credit</target>
+      </trans-unit>
+      <trans-unit id="c232c663ef7b4db38f8840b4903cdf14">
+        <source>incl. gift card / voucher (payment means)</source>
+        <target>incl. gift card / voucher (payment means)</target>
+      </trans-unit>
+      <trans-unit id="ba59d4032030a265b0d8d24dfe14fa00">
+        <source>Gift card sale (excluded from margin)</source>
+        <target>Gift card sale (excluded from margin)</target>
+      </trans-unit>
+      <trans-unit id="4d6f4dcd72910f3abb38fee01d2d854a">
+        <source>This order sells a gift card: its amount is a liability, not turnover.</source>
+        <target>This order sells a gift card: its amount is a liability, not turnover.</target>
+      </trans-unit>
+      <trans-unit id="d406613e3aba491353e7cc933bfb8b37">
+        <source>Gift card product IDs</source>
+        <target>Gift card product IDs</target>
+      </trans-unit>
+      <trans-unit id="4a2d6bc85f9fc95c2e4758a9f39f158d">
+        <source>Comma-separated product IDs treated as gift-card sales (excluded from revenue and cost).</source>
+        <target>Comma-separated product IDs treated as gift-card sales (excluded from revenue and cost).</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
