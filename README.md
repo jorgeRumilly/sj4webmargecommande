@@ -130,3 +130,17 @@ dropshipping*, vérifier / compléter (dont Castex), puis *Tout reconstruire*.
 `SJ4WEB_MARGIN_GIFTCARD_PRODUCTS`. Traitement des **cartes cadeaux & avoirs comme
 moyen de paiement** (cf. section ci-dessus). ⚠ La formule de revenu change →
 ***Tout reconstruire*** le cache après la mise à jour.
+
+## MCP (Agent Bridge) — 2.1.0
+
+Optionnel : avec `sj4web_agentbridge` >= 0.15.0, un agent IA lit la commission de paiement et la marge des commandes.
+
+| Outil | Droit | Rôle |
+|---|---|---|
+| `order_payment_fee_get` | read | Commission HT d'une commande, tout moyen de paiement, avec son état |
+| `payment_fees_list` | read | Commissions d'une période, totaux par module de paiement, commandes sans commission |
+| `order_margin_get` | read | Marge d'une commande calculée maintenant |
+| `order_margins_list` | read | Marges en cache, filtres et tri |
+| `order_payment_fee_fetch` | `payment_fee_fetch`, deux temps | Demande à PayPlug / PayPal une commission manquante (via `sj4web_payplugreport` ou l'override PayPal), annulable |
+
+Déploiement : copier le module, lancer sa mise à jour (2.1.0 enregistre le hook), vider `var/cache`, vérifier le panneau « Extensions » d'Agent Bridge, ajouter `payment_fee_fetch` au jeton de l'agent seulement s'il doit pouvoir déclencher la récupération (réglage global « écritures » actif). Test local : `php modules/sj4webmargecommande/tests/integration_agentbridge.php`.

@@ -2,7 +2,7 @@
 <module>
     <name>sj4webmargecommande</name>
     <displayName><![CDATA[SJ4WEB - Order margin]]></displayName>
-    <version><![CDATA[2.0.2]]></version>
+    <version><![CDATA[2.1.0]]></version>
     <description><![CDATA[Theoretical order margin: revenue - purchase cost - dropshipping cost - payment commission.]]></description>
     <author><![CDATA[SJ4WEB.FR]]></author>
     <tab><![CDATA[administration]]></tab>
