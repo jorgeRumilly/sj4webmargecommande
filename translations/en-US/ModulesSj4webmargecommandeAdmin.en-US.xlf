@@ -418,6 +418,10 @@
         <source>Comma-separated product IDs treated as gift-card sales (excluded from revenue and cost).</source>
         <target>Comma-separated product IDs treated as gift-card sales (excluded from revenue and cost).</target>
       </trans-unit>
+      <trans-unit id="9da8c9c595a25fdb6c6289b8337e8dc4">
+        <source>Fetch a missing payment commission from PayPlug or PayPal and store it (undoable).</source>
+        <target>Fetch a missing payment commission from PayPlug or PayPal and store it (undoable).</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

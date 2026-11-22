@@ -1,5 +1,14 @@
 # CHANGELOG — sj4webmargecommande
 
+## [2.1.0] - 2026-11-22 (outils MCP : commission de paiement et marge, GitHub jorgeRumilly/ciegrandeoursepresta#84)
+
+- **Extension Agent Bridge** (optionnelle, `sj4web_agentbridge` >= 0.15.0), hook `actionSj4webAgentbridgeCollectExtensions` ; les classes `classes/Mcp/` ne sont chargées que par ce hook, le module fonctionne sans Agent Bridge.
+- Lecture (droit `read`) : `order_payment_fee_get` (commission HT d'une commande quel que soit le moyen de paiement, avec un état : `stored`, `missing`, `pending`, `given_up`, `zero_reported`, `not_applicable`, `not_tracked`), `payment_fees_list` (période, totaux par module de paiement, `only_missing`), `order_margin_get` (calculée maintenant, même calcul que le widget BO), `order_margins_list` (cache, filtres, tri).
+- Opération en deux temps `order_payment_fee_fetch` (nouveau droit `payment_fee_fetch`) : demande la commission manquante au prestataire **par le code qui le fait déjà** — PayPlug : `PayplugFeeSync::runForOrder` de `sj4web_payplugreport` (rapport de la journée, peut remplir les autres commandes PayPlug du jour, listées dans l'aperçu) ; PayPal : le hook de l'override `override/modules/paypal/paypal.php`. Recalcule la marge. Une commission > 0 n'est jamais modifiée. Annulation exacte de `order_fees` et du journal PayPlug (mêmes ids).
+- `upgrade/upgrade-2.1.0.php` enregistre le hook. Une chaîne ajoutée aux XLF (domaine écrit en toutes lettres dans le `trans()`).
+- Test : `tests/integration_agentbridge.php` (45 vérifications, prestataires simulés : aucun appel PayPlug / PayPal).
+- Signalé, non modifié : les autres `trans()` du module passent le domaine par la constante `T_DOMAIN`, que l'extracteur de la page BO « Traductions » ne voit pas.
+
 ## [2.0.0] - 2026-09-01 (suite : base de calcul du coût de drop)
 
 - **Coût de drop calculé sur les quantités NON remboursées** uniquement (produits

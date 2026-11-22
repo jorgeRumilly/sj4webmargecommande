@@ -26,7 +26,7 @@ class Sj4webMargeCommande extends Module
     {
         $this->name = 'sj4webmargecommande';
         $this->tab = 'administration';
-        $this->version = '2.0.2';
+        $this->version = '2.1.0';
         $this->author = 'SJ4WEB.FR';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -67,6 +67,7 @@ class Sj4webMargeCommande extends Module
             && $this->registerHook('actionObjectOrderSlipAddAfter')
             && $this->registerHook('actionOrderStatusPostUpdate')
             && $this->registerHook('actionSj4webOrderFeeCaptured')
+            && $this->registerHook('actionSj4webAgentbridgeCollectExtensions') // optional MCP tools (Agent Bridge)
             && $this->installDB()
             && MarginConfig::installDefaults()
             && $this->installTab();
@@ -353,6 +354,33 @@ class Sj4webMargeCommande extends Module
     /**
      * @return string
      */
+    /**
+     * Agent Bridge (MCP) extension: payment commission and margin tools. Called only by sj4web_agentbridge;
+     * without it this module never loads its MCP classes. See README.md, section "MCP".
+     *
+     * @param array $params ['registry' => ExtensionRegistry]
+     *
+     * @return void
+     */
+    public function hookActionSj4webAgentbridgeCollectExtensions($params)
+    {
+        $registry = isset($params['registry']) ? $params['registry'] : null;
+        if (!is_object($registry) || !class_exists('Sj4webAgentbridge\Extension\Extension')) {
+            return;
+        }
+        $this->loadClasses();
+        require_once __DIR__ . '/classes/Mcp/ExtensionBuilder.php';
+        foreach (\Sj4webMargecommande\Mcp\ExtensionBuilder::FILES as $file) {
+            require_once __DIR__ . '/classes/Mcp/' . $file . '.php';
+        }
+
+        $registry->register(\Sj4webMargecommande\Mcp\ExtensionBuilder::build(
+            $this->name,
+            $this->version,
+            $this->trans('Fetch a missing payment commission from PayPlug or PayPal and store it (undoable).', [], 'Modules.Sj4webmargecommande.Admin')
+        ));
+    }
+
     public function getContent()
     {
         $this->loadClasses();

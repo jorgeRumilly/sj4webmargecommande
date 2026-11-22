@@ -2,7 +2,7 @@
 <module>
     <name>sj4webmargecommande</name>
     <displayName><![CDATA[SJ4WEB - Marge commande]]></displayName>
-    <version><![CDATA[2.0.2]]></version>
+    <version><![CDATA[2.1.0]]></version>
     <description><![CDATA[Marge th&eacute;orique de la commande : revenu - co&ucirc;t d&#039;achat - co&ucirc;t dropshipping - commission de paiement.]]></description>
     <author><![CDATA[SJ4WEB.FR]]></author>
     <tab><![CDATA[administration]]></tab>
